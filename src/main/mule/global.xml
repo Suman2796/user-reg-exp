@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:sns="http://www.mulesoft.org/schema/mule/sns" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sns http://www.mulesoft.org/schema/mule/sns/current/mule-sns.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="41d1a0a9-6b2f-4a9b-af5a-36fad0d4d5dc" file="dev.yaml" />
+	<sns:config name="Amazon_SNS_configuration" doc:name="Amazon SNS configuration" doc:id="f3060cff-ad2d-4807-9f2e-aca45ab84aaf" >
+		<sns:basic-connection testTopic="arn:aws:sns:us-east-1:453970996285:Nifty50Topic" accessKey="${sns.accessKey}" secretKey="${sns.secretKey}" />
+	</sns:config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="db9eff9a-f4fa-40d8-a6f2-93bef421a906" >
+		<db:my-sql-connection host="${db.host}" port="${db.port}" user="${db.username}" password="${db.password}" database="sql6460085" />
+	</db:config>
+	<configuration doc:name="Configuration" doc:id="87925f2a-3fcb-49e6-8261-03d0a42fca43" defaultErrorHandler-ref="globalError_Handler" />
+	<api-gateway:autodiscovery apiId="17524301" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="231ceaa3-4792-46e9-8412-1b951b43f7aa" flowRef="stock-alert-notification-main" />
+	<error-handler name="globalError_Handler" doc:id="b2799595-2247-470c-8ba1-75ebf68e78a2" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b87ce878-6354-4d34-9d54-4c53fb364261" type="ANY">
+			<ee:transform doc:name="Transform Message" doc:id="2f6eaaaa-e644-4dd0-bd0c-0e4e23ef2509" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"Error": error.detailedDescription
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
+</mule>

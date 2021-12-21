@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_16e2c8b6_c1d7_4c4b_b426_ed9b54cadeee_Output_Variables_arn = String
+

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="interface-suite.xml" />
+	<munit:test name="stock-alert-notification-main-test" doc:id="0bd74bb9-3582-42b9-a153-b4dc59b1ea5e" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="9fda1c13-d5c9-48c0-8c30-7715860dd376" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://stockalertnotificationmaintest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://stockalertnotificationmaintest\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to stock-alert-notification-main" doc:id="eff4a185-c187-48a4-809e-c2a00aa80f48" name="stock-alert-notification-main"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="b7dc6735-c5d8-4e3d-9593-44611a5c3986" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import stockalertnotificationmaintest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify APIkit Router" doc:id="e0ef9be0-5252-4e22-967e-74acc3ee6cce" processor="apikit:router" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="18d9349e-b889-4d7f-9822-473562361687" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="post:\registration:application\json:stock-alert-notification-config-test" doc:id="7c9d6b40-fb38-4f4f-a356-55e48b26b003" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="e9525718-484f-4650-8527-36028f41bad4" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://postregistrationapplicationjsonstockalertnotificationconfigtest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://postregistrationapplicationjsonstockalertnotificationconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://postregistrationapplicationjsonstockalertnotificationconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to post:\registration:application\json:stock-alert-notification-config" doc:id="71733a5f-16de-451b-abb6-acfe475c375e" name="post:\registrations:application\json:stock-alert-notification-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="640bfeb7-c08f-4768-8cfd-5f75bc1cb50e" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import postregistrationapplicationjsonstockalertnotificationconfigtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify Flow Reference" doc:id="e24f115f-78d1-4f71-8987-4d9094003538" processor="flow-ref" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="1c97f618-00aa-42b5-a88a-e0fc362e0613" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

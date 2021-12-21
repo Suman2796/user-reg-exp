@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_286aa386_0ad8_4928_aa00_6895b7f4ff7c_Input_Attributes = Any
+

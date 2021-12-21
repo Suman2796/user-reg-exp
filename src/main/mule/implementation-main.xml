@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:sns="http://www.mulesoft.org/schema/mule/sns"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sns http://www.mulesoft.org/schema/mule/sns/current/mule-sns.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="stock-alert-user-registration" doc:id="1665f464-94a3-4401-bf15-2991bf946d19" >
+		<logger level="INFO" doc:name="Start-Logger" doc:id="58af89b5-46ca-4aef-be42-384147d22298" message="This is the start of user stock alert registration process"/>
+		<set-variable value="#[message.payload]" doc:name="SavePayloadFromPost" doc:id="3c803f8d-cedd-49d2-89bd-abe4b0f49a9b" variableName="initialPayload"/>
+		<sns:list-topics doc:name="List topics" doc:id="8c231e80-f782-4149-9afc-4420018718b3" config-ref="Amazon_SNS_configuration"/>
+		<ee:transform doc:name="Get_Individual_Topic_Names" doc:id="f80ace4b-f291-4c23-b930-21d2d6a12eca" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json  
+---
+payload map ((item, index) -> {
+  "topicName": splitBy(item.payload ,":")[-1],
+  "arn": item.payload
+})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="972b7554-1797-44e1-959a-22df85b0a2bf" message="#[payload]"/>
+		<choice doc:name="Choice" doc:id="2b654069-f881-4f84-b6f9-e12f1a284e3f" >
+			<when expression="#[payload.topicName contains vars.initialPayload.stockName]">
+				<set-variable value="#[%dw 2.0
+&#10;
+&#10;output application/json
+&#10;
+&#10;
+&#10;
+&#10;var topicDetails = 
+&#10;
+&#10;payload filter ((item, index) -&gt; item.topicName == vars.initialPayload.stockName )
+&#10;
+&#10;---
+&#10;
+&#10;
+&#10;
+&#10;topicDetails[0].arn]" doc:name="Set Variable" doc:id="0bcc4c57-3de4-4499-af2e-b9e905d1b32b" variableName="arn"/>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="Flow Reference" doc:id="210ffcce-36fd-4f3d-ac84-de04bf0fb632" name="create-topic"/>
+			</otherwise>
+		</choice>
+		<db:insert doc:name="Insert to stockalert" doc:id="20f96f06-e6f2-435a-95ec-79bee805f434" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO `stockalert`
+(`username`,`mobileNumber`,`stockName`,`notificationMode`,`highTargetPrice`,`lowTargetPrice`,`arn`)
+VALUES ( :username , :mobileNumber , :stockName , :notificationMode , :highTargetPrice , :lowTargetPrice , :arn)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[vars.initialPayload ++ { "arn" : vars.arn }]]]></db:input-parameters>
+		</db:insert>
+		<set-payload value='#[%dw 2.0
+&#10;
+&#10;output application/json  
+&#10;
+&#10;---
+&#10;{
+&#10;  "Message" : "You have successfully subscribed for the stock alert notification service"
+&#10;}]' doc:name="Message_Added_To_Print" doc:id="4d578972-0a58-4c29-ba82-c335ce345fbe" />
+		<logger level="INFO" doc:name="End-Logger" doc:id="5cd6c0d6-3f28-4ad6-8d51-5e2b46e7cbab" message="End of user stock alert registration process"/>
+	</flow>
+	<flow name="create-topic" doc:id="aa9096ef-83a4-48cd-8f1d-38074debec19" >
+		<sns:create-topic doc:name="Create-topic" doc:id="2145b19e-a506-4829-bce8-9ebae592f396" topicName="#[vars.initialPayload.stockName]" config-ref="Amazon_SNS_configuration"/>
+		<set-variable value="#[payload]" doc:name="Save_ARN" doc:id="29a17804-1c53-445a-95be-0c3bc6bc0b42" variableName="arn"/>
+		<sns:subscribe protocol="SQS" doc:name="Subscribe" doc:id="b150398f-20ff-4538-a1c8-b6c949e32723" topicArn="#[payload]" endpoint="arn:aws:sqs:us-east-1:453970996285:stockTargetQueue" config-ref="Amazon_SNS_configuration"/>
+		<logger level="INFO" doc:name="Logger" doc:id="9372297f-a94f-4005-8a1c-ddbdc550ce33" message="#[payload]"/>
+	</flow>
+</mule>

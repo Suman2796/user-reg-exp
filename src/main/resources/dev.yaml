@@ -1,0 +1,9 @@
+sns:
+  accessKey : "AKIAWTMWHVQ6XXBNJ5JV"
+  secretKey : "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"
+ 
+db:
+  username : "sql6460085"
+  password : "Zr4ALPWzdc"
+  host : "sql6.freemysqlhosting.net"
+  port : "3306"

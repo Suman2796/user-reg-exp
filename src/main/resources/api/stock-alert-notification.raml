@@ -1,0 +1,28 @@
+#%RAML 1.0
+title: stock-alert-notification
+version: v1
+
+protocols:
+  - HTTPS
+  - HTTP
+securitySchemes:
+  client-id-required: !include security/client-id-required-security-scheme.raml
+
+securedBy:
+  - client-id-required
+
+traits:
+  error_responses: !include trait/traits.raml
+
+/registrations:
+ post:
+  is:
+    - error_responses
+  body:
+    application/json:
+      example: !include examples/requestExample.raml
+  responses:
+    200:
+      body:
+        application/json:
+          example: !include examples/responseExample.raml

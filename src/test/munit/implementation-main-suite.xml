@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="implementation-main-suite.xml" />
+	<munit:test name="stock-alert-user-registration-test" doc:id="a93df8ed-8f73-425e-875f-779c19797dfd" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Set Variable" doc:id="70d83a44-880a-406b-87cf-c0ce70e960ac" processor="set-variable">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="3c803f8d-cedd-49d2-89bd-abe4b0f49a9b" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://stockalertuserregistrationtest\mock_variable_.dwl')]" />
+						<munit-tools:variable key="initialPayload" value="#[output application/json --- readUrl('classpath://stockalertuserregistrationtest\mock_variable_1.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:spy doc:name="Spy Flow Reference" doc:id="c747532f-3620-4d91-b1fe-5df181dbd9c7" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="210ffcce-36fd-4f3d-ac84-de04bf0fb632" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="d1584fe5-0318-4149-bd6c-c57052e1ef31" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import stockalertuserregistrationtest::spy_assert_payload
+---
+spy_assert_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="3fb16f13-f573-45f1-b6fb-44b49a1fd8e3" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import stockalertuserregistrationtest::spy_assert_payload1
+---
+spy_assert_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+			<munit:set-event doc:name="Set Input" doc:id="f1a55c3c-f405-4196-b5e8-8fc7264da50e" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://stockalertuserregistrationtest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://stockalertuserregistrationtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://stockalertuserregistrationtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to stock-alert-user-registration" doc:id="9a8336c3-2cb9-4784-9dfb-ac474e3def25" name="stock-alert-user-registration"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="31e67c5d-b028-4496-b050-57b841fa74d7" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import stockalertuserregistrationtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify List topics" doc:id="54166cfb-6fb6-4783-b48d-f81e20a3b757" processor="sns:list-topics" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="8c231e80-f782-4149-9afc-4420018718b3" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Transform Message" doc:id="8d2a9a14-c5a9-41be-9862-ac89bceb838f" processor="ee:transform" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="f80ace4b-f291-4c23-b930-21d2d6a12eca" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Insert" doc:id="7828df81-3574-4236-b0f9-6b4824490be6" processor="db:insert" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="20f96f06-e6f2-435a-95ec-79bee805f434" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Set Payload" doc:id="88ee8f3f-53f8-4b99-a812-9e377a372c73" processor="set-payload" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="4d578972-0a58-4c29-ba82-c335ce345fbe" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Flow Reference" doc:id="1a7a06f3-be0f-4dc9-9d1b-14c0178abec6" processor="flow-ref" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="210ffcce-36fd-4f3d-ac84-de04bf0fb632" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="stock-alert-user-registration-test2" doc:id="8cc190e1-09ba-490c-9643-15159abbdafc" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Set Variable" doc:id="faa44465-d1d3-4d3d-ab9a-ff793d5598e5" processor="set-variable">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="0bcc4c57-3de4-4499-af2e-b9e905d1b32b" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://stockalertuserregistrationtest2\mock_variable_.dwl')]" />
+						<munit-tools:variable key="initialPayload" value="#[output application/json --- readUrl('classpath://stockalertuserregistrationtest2\mock_variable_1.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="arn" value="#[output application/json --- readUrl('classpath://stockalertuserregistrationtest2\mock_variable_2.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="0cbf69da-ec00-4009-923d-6b07770ea1d3" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://stockalertuserregistrationtest2\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://stockalertuserregistrationtest2\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://stockalertuserregistrationtest2\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to stock-alert-user-registration" doc:id="9562ba6d-9ee9-4755-95c4-3fc610904050" name="stock-alert-user-registration"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="3b1d15df-7e0a-43ae-94e9-fe3f7b474313" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import stockalertuserregistrationtest2::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify List topics" doc:id="aa19562f-d60d-4329-9958-454a875a11c4" processor="sns:list-topics" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="8c231e80-f782-4149-9afc-4420018718b3" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Transform Message" doc:id="e25393b2-d513-42df-a307-8f056f1ff0fe" processor="ee:transform" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="f80ace4b-f291-4c23-b930-21d2d6a12eca" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Insert" doc:id="62f99453-2cbe-427a-9023-902566e5b032" processor="db:insert" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="20f96f06-e6f2-435a-95ec-79bee805f434" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Set Payload" doc:id="47b90a41-5712-4916-93ad-14d886d5b1a2" processor="set-payload" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="4d578972-0a58-4c29-ba82-c335ce345fbe" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Set Variable" doc:id="55c65f2a-7bd2-4d5f-af78-76bd84e7b6a6" processor="set-variable" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="3c803f8d-cedd-49d2-89bd-abe4b0f49a9b" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="Copy_of_stock-alert-user-registration-test2" doc:id="d635e238-42f0-4043-af8f-1ef0d5ad049b">
+			<munit:behavior>
+				<munit-tools:mock-when doc:name="Copy_of_Mock Set Variable" doc:id="42d55783-4560-4bcf-acab-c9877ce9d7f5" processor="set-variable">
+					<munit-tools:with-attributes>
+						<munit-tools:with-attribute whereValue="0bcc4c57-3de4-4499-af2e-b9e905d1b32b" attributeName="doc:id" />
+					</munit-tools:with-attributes>
+					<munit-tools:then-return>
+						<munit-tools:variables>
+							<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://stockalertuserregistrationtest2\mock_variable_.dwl')]" />
+							<munit-tools:variable key="initialPayload" value="#[output application/json --- readUrl('classpath://stockalertuserregistrationtest2\mock_variable_1.dwl')]" mediaType="application/json" encoding="UTF-8" />
+							<munit-tools:variable key="arn" value="#[output application/json --- readUrl('classpath://stockalertuserregistrationtest2\mock_variable_2.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						</munit-tools:variables>
+					</munit-tools:then-return>
+				</munit-tools:mock-when>
+				<munit:set-event doc:name="Copy_of_Set Input" doc:id="46b3bac1-be86-45b3-b689-f6f25197a0a7">
+					<munit:payload value="#[output application/json --- readUrl('classpath://stockalertuserregistrationtest2\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+					<munit:attributes value="#[readUrl('classpath://stockalertuserregistrationtest2\set-event_attributes.dwl')]" />
+					<munit:variables>
+						<munit:variable key="outboundHeaders" value="#[readUrl('classpath://stockalertuserregistrationtest2\set-event_variable_.dwl')]" />
+					</munit:variables>
+				</munit:set-event>
+			</munit:behavior>
+			<munit:execution>
+				<flow-ref doc:name="Copy_of_Flow-ref to stock-alert-user-registration" doc:id="eef3debb-4ef6-488e-8445-3c9aeb49e3ee" name="create-topic" />
+			</munit:execution>
+			<munit:validation>
+				<munit-tools:assert doc:name="Copy_of_Assert payload" doc:id="152ff7f6-bb92-410e-9b77-347e79dc12bb" message="The payload does not match">
+					<munit-tools:that><![CDATA[#[%dw 2.0
+import stockalertuserregistrationtest2::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+				</munit-tools:assert>
+				<munit-tools:verify-call doc:name="Copy_of_Verify List topics" doc:id="f9db3733-69f6-44cd-ae2c-d4886e2e1cd0" processor="sns:list-topics" times="1">
+					<munit-tools:with-attributes>
+						<munit-tools:with-attribute whereValue="8c231e80-f782-4149-9afc-4420018718b3" attributeName="doc:id" />
+					</munit-tools:with-attributes>
+				</munit-tools:verify-call>
+				<munit-tools:verify-call doc:name="Copy_of_Verify Transform Message" doc:id="a1ed4fa3-1037-43d4-acc2-3325e6d4d562" processor="ee:transform" times="1">
+					<munit-tools:with-attributes>
+						<munit-tools:with-attribute whereValue="f80ace4b-f291-4c23-b930-21d2d6a12eca" attributeName="doc:id" />
+					</munit-tools:with-attributes>
+				</munit-tools:verify-call>
+				<munit-tools:verify-call doc:name="Copy_of_Verify Insert" doc:id="22d4ba2d-cc31-4ac5-baa2-204e2f9360b9" processor="db:insert" times="1">
+					<munit-tools:with-attributes>
+						<munit-tools:with-attribute whereValue="20f96f06-e6f2-435a-95ec-79bee805f434" attributeName="doc:id" />
+					</munit-tools:with-attributes>
+				</munit-tools:verify-call>
+				<munit-tools:verify-call doc:name="Copy_of_Verify Set Payload" doc:id="ecc281e1-54b1-46cf-a031-6e6ff36281a9" processor="set-payload" times="1">
+					<munit-tools:with-attributes>
+						<munit-tools:with-attribute whereValue="4d578972-0a58-4c29-ba82-c335ce345fbe" attributeName="doc:id" />
+					</munit-tools:with-attributes>
+				</munit-tools:verify-call>
+				<munit-tools:verify-call doc:name="Copy_of_Verify Set Variable" doc:id="f1b4df75-8eb7-4b86-ba8a-fef7ac0a3326" processor="set-variable" times="1">
+					<munit-tools:with-attributes>
+						<munit-tools:with-attribute whereValue="3c803f8d-cedd-49d2-89bd-abe4b0f49a9b" attributeName="doc:id" />
+					</munit-tools:with-attributes>
+				</munit-tools:verify-call>
+			</munit:validation>
+		</munit:test>
+	<munit:test name="create-topic-test" doc:id="81d72844-da7b-4a28-ac82-9dbd1eacae0a" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Create-topic" doc:id="380ebf31-5142-476d-8dda-c3e7fc4e3f51" processor="sns:create-topic">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2145b19e-a506-4829-bce8-9ebae592f396" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output text/plain --- readUrl('classpath://createtopictest\mock_payload.dwl')]" mediaType="text/plain" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://createtopictest\mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://createtopictest\mock_variable_.dwl')]" />
+						<munit-tools:variable key="initialPayload" value="#[output application/json --- readUrl('classpath://createtopictest\mock_variable_1.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="1b96365e-c76d-4866-8cb7-6ef897d9d6bb" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://createtopictest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://createtopictest\set-event_variable_.dwl')]" />
+					<munit:variable key="initialPayload" value="#[output application/json --- readUrl('classpath://createtopictest\set-event_variable_1.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to create-topic" doc:id="1180515d-b58c-46da-b509-172d10ae437f" name="create-topic"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="30521f4d-d46b-4059-aad2-4d4bb2b7e1fc" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import createtopictest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify Logger" doc:id="ece110db-4bfe-45dc-a912-4e7c262d2e3f" processor="logger" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="9372297f-a94f-4005-8a1c-ddbdc550ce33" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Save_ARN" doc:id="6dda467f-587c-4193-9ae3-74ce459a4f7c" processor="set-variable" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="29a17804-1c53-445a-95be-0c3bc6bc0b42" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Subscribe" doc:id="5be4b0d2-b9bb-43da-a7a0-6c7e16df1b39" processor="sns:subscribe" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="b150398f-20ff-4538-a1c8-b6c949e32723" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
