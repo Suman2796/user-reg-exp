@@ -16,7 +16,6 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
 		<db:my-sql-connection host="${db.host}" port="${db.port}" user="${db.username}" password="${db.password}" database="sql6460085" />
 	</db:config>
 	<configuration doc:name="Configuration" doc:id="87925f2a-3fcb-49e6-8261-03d0a42fca43" defaultErrorHandler-ref="globalError_Handler" />
-	<api-gateway:autodiscovery apiId="17524301" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="231ceaa3-4792-46e9-8412-1b951b43f7aa" flowRef="stock-alert-notification-main" />
 	<error-handler name="globalError_Handler" doc:id="b2799595-2247-470c-8ba1-75ebf68e78a2" >
 		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b87ce878-6354-4d34-9d54-4c53fb364261" type="ANY">
 			<ee:transform doc:name="Transform Message" doc:id="2f6eaaaa-e644-4dd0-bd0c-0e4e23ef2509" >
